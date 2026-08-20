@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Veritas — Know what's real{% endblock %}
+{% block bodyclass %}page-home{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow reveal">Machine-learning news verification</span>
+    <h1 class="hero-title reveal">
+      Know what's <em>real</em>,<br>before you share it.
+    </h1>
+    <p class="hero-sub reveal">
+      Paste any headline or article. Veritas runs it through a trained
+      classifier and tells you — in seconds — whether it reads as
+      <strong>real</strong> or <strong>fake</strong>, with a confidence score
+      you can trust or challenge.
+    </p>
+    <div class="hero-actions reveal">
+      <a href="{{ url_for('detector') }}" class="btn btn-primary btn-lg">
+        Analyze a headline
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#how-it-works" class="btn btn-ghost btn-lg">See how it works</a>
+    </div>
+
+    <div class="hero-typing reveal" aria-hidden="true">
+      <span class="typing-label">Recently checked:</span>
+      <span class="typing-text" id="typingText"></span><span class="typing-cursor">|</span>
+    </div>
+  </div>
+
+  <div class="hero-glow" aria-hidden="true"></div>
+</section>
+
+<section class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-card liquid-glass reveal">
+      <span class="stat-number" data-count="{{ stats.total }}">0</span>
+      <span class="stat-label">Articles analyzed</span>
+    </div>
+    <div class="stat-card liquid-glass reveal">
+      <span class="stat-number" data-count="{{ stats.real }}">0</span>
+      <span class="stat-label">Flagged real</span>
+    </div>
+    <div class="stat-card liquid-glass reveal">
+      <span class="stat-number" data-count="{{ stats.fake }}">0</span>
+      <span class="stat-label">Flagged fake</span>
+    </div>
+    <div class="stat-card liquid-glass reveal">
+      <span class="stat-number">{{ stats.accuracy if stats.accuracy else '—' }}<span class="stat-suffix">%</span></span>
+      <span class="stat-label">Model accuracy</span>
+    </div>
+  </div>
+  <p class="stats-footnote">62% of adults say they've shared a news story later found to be inaccurate — verification takes seconds, regret doesn't.</p>
+</section>
+
+<section class="how-section" id="how-it-works">
+  <div class="section-head reveal">
+    <span class="eyebrow">The pipeline</span>
+    <h2>Four steps, one verdict.</h2>
+  </div>
+
+  <div class="pipeline-grid">
+    <div class="pipeline-card liquid-glass reveal">
+      <span class="pipeline-index">01</span>
+      <h3>Preprocess</h3>
+      <p>Text is lowercased, stripped of punctuation and noise, and lemmatized — the same cleanup the model was trained on.</p>
+    </div>
+    <div class="pipeline-card liquid-glass reveal">
+      <span class="pipeline-index">02</span>
+      <h3>Vectorize</h3>
+      <p>A TF-IDF vectorizer turns the cleaned text into a weighted vector of the words and phrases that matter most.</p>
+    </div>
+    <div class="pipeline-card liquid-glass reveal">
+      <span class="pipeline-index">03</span>
+      <h3>Classify</h3>
+      <p>The best-performing model — chosen automatically from four candidates during training — scores the vector.</p>
+    </div>
+    <div class="pipeline-card liquid-glass reveal">
+      <span class="pipeline-index">04</span>
+      <h3>Report</h3>
+      <p>You get a REAL / FAKE verdict with a confidence percentage, logged to a searchable history.</p>
+    </div>
+  </div>
+</section>
+
+<section class="models-section">
+  <div class="section-head reveal">
+    <span class="eyebrow">Under the hood</span>
+    <h2>Four models compete. One wins.</h2>
+  </div>
+  <div class="models-grid">
+    <div class="model-chip liquid-glass reveal">Logistic Regression</div>
+    <div class="model-chip liquid-glass reveal">Naive Bayes</div>
+    <div class="model-chip liquid-glass reveal">Random Forest</div>
+    <div class="model-chip liquid-glass reveal">Passive Aggressive</div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="cta-card liquid-glass reveal">
+    <h2>Ready to fact-check something?</h2>
+    <p>Paste a headline, a paragraph, or a full article. It takes about as long as reading the first sentence.</p>
+    <a href="{{ url_for('detector') }}" class="btn btn-primary btn-lg">
+      Open the detector
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+</section>
+
+{% endblock %}

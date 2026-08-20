@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Admin login — Veritas{% endblock %}
+{% block bodyclass %}page-login{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+  <div class="auth-card liquid-glass reveal">
+    <span class="eyebrow">Admin access</span>
+    <h1>Log in</h1>
+    <p class="section-sub">Manage the dashboard and monitor model performance.</p>
+
+    <form method="POST" action="{{ url_for('login') }}" class="auth-form" novalidate>
+      {{ form.hidden_tag() }}
+
+      <label for="username" class="field-label">Username</label>
+      {{ form.username(id="username", class="text-input", placeholder="admin", autocomplete="username") }}
+      {% for error in form.username.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+
+      <label for="password" class="field-label">Password</label>
+      {{ form.password(id="password", class="text-input", placeholder="••••••••", autocomplete="current-password") }}
+      {% for error in form.password.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+
+      <label class="checkbox-label">
+        {{ form.remember() }} Remember me
+      </label>
+
+      <button type="submit" class="btn btn-primary btn-block">Log in</button>
+    </form>
+
+    <p class="auth-hint">Default credentials are set in <code>config.py</code> / environment variables — change them before deploying.</p>
+  </div>
+</section>
+{% endblock %}

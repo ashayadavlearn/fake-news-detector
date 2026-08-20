@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}History — Veritas{% endblock %}
+{% block bodyclass %}page-history{% endblock %}
+
+{% block content %}
+<section class="history-section">
+  <div class="section-head reveal">
+    <span class="eyebrow">The record</span>
+    <h1>Prediction history</h1>
+    <p class="section-sub">Every check Veritas has run, searchable and exportable.</p>
+  </div>
+
+  <div class="history-toolbar liquid-glass reveal">
+    <form class="search-form" method="GET" action="{{ url_for('history') }}">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="search-icon"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input type="text" name="query" value="{{ query }}" placeholder="Search by title or text…" class="search-input" aria-label="Search history">
+      {% if query %}<a href="{{ url_for('history') }}" class="search-clear" title="Clear search">&times;</a>{% endif %}
+    </form>
+    <a href="{{ url_for('export_history') }}" class="btn btn-ghost btn-sm">
+      Export CSV
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3V15M12 15L8 11M12 15L16 11M5 21H19" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+
+  <div class="history-table-wrap liquid-glass reveal">
+    {% if pagination.items %}
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>News title</th>
+          <th>Prediction</th>
+          <th>Confidence</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in pagination.items %}
+        <tr>
+          <td class="col-date">{{ entry.created_at.strftime('%b %d, %Y · %H:%M') }}</td>
+          <td class="col-title" title="{{ entry.news_text }}">{{ entry.news_title }}</td>
+          <td>
+            <span class="badge badge-{{ 'real' if entry.prediction == 'REAL' else 'fake' }}">
+              {{ 'Real ✅' if entry.prediction == 'REAL' else 'Fake ❌' }}
+            </span>
+          </td>
+          <td class="col-confidence">{{ '%.1f'|format(entry.confidence) }}%</td>
+          <td class="col-actions">
+            <form method="POST" action="{{ url_for('delete_history', entry_id=entry.id, query=query, page=pagination.page) }}" class="inline-form" onsubmit="return confirm('Delete this history entry?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="icon-btn" title="Delete">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 7H20M9 7V4H15V7M6 7L7 20H17L18 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="table-empty">
+      <p>No history yet{% if query %} matching "<strong>{{ query }}</strong>"{% endif %}.</p>
+      <a href="{{ url_for('detector') }}" class="btn btn-primary btn-sm">Run your first check</a>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if pagination.pages > 1 %}
+  <div class="pagination reveal">
+    <a class="page-link {{ 'disabled' if not pagination.has_prev }}"
+       href="{{ url_for('history', page=pagination.prev_num, query=query) if pagination.has_prev else '#' }}">← Prev</a>
+    <span class="page-status">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+    <a class="page-link {{ 'disabled' if not pagination.has_next }}"
+       href="{{ url_for('history', page=pagination.next_num, query=query) if pagination.has_next else '#' }}">Next →</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

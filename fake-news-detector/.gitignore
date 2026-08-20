@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.db
+instance/
+
+# Keep the trained model artifacts out of git if you retrain often;
+# comment these out if you'd rather ship the trained model in the repo.
+# model/*.pkl
+
+.DS_Store
+*.egg-info/
+.venv/
+venv/

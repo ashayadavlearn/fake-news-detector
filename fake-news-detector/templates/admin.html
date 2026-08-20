@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Veritas{% endblock %}
+{% block bodyclass %}page-admin{% endblock %}
+
+{% block content %}
+<section class="admin-section">
+  <div class="section-head reveal">
+    <span class="eyebrow">Admin</span>
+    <h1>Dashboard</h1>
+    <p class="section-sub">Signed in as <strong>{{ current_user.username }}</strong></p>
+  </div>
+
+  <div class="admin-grid">
+    <div class="stat-card liquid-glass reveal">
+      <span class="stat-number">{{ stats.total }}</span>
+      <span class="stat-label">Total predictions</span>
+    </div>
+    <div class="stat-card liquid-glass reveal">
+      <span class="stat-number">{{ stats.real }}</span>
+      <span class="stat-label">Real news count</span>
+    </div>
+    <div class="stat-card liquid-glass reveal">
+      <span class="stat-number">{{ stats.fake }}</span>
+      <span class="stat-label">Fake news count</span>
+    </div>
+    <div class="stat-card liquid-glass reveal">
+      <span class="stat-number">{{ stats.model_accuracy if stats.model_accuracy else '—' }}<span class="stat-suffix">%</span></span>
+      <span class="stat-label">Model accuracy</span>
+    </div>
+  </div>
+
+  <div class="admin-columns">
+    <div class="admin-card liquid-glass reveal">
+      <h3>Distribution</h3>
+      <canvas id="distributionChart" height="220"></canvas>
+    </div>
+
+    <div class="admin-card liquid-glass reveal">
+      <h3>Model info</h3>
+      <dl class="info-list">
+        <div><dt>Active model</dt><dd>{{ stats.model_name }}</dd></div>
+        <div><dt>Trained at</dt><dd>{{ stats.trained_at }}</dd></div>
+        <div><dt>Avg. confidence</dt><dd>{{ stats.avg_confidence }}%</dd></div>
+      </dl>
+      {% if stats.all_model_results %}
+      <h4 class="sub-heading">Model comparison (accuracy)</h4>
+      <ul class="model-results">
+        {% for name, acc in stats.all_model_results.items() %}
+        <li>
+          <span>{{ name }}</span>
+          <span class="mono">{{ '%.1f'|format(acc * 100) }}%</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="admin-card liquid-glass reveal">
+    <div class="admin-card-head">
+      <h3>Recent activity</h3>
+      <a href="{{ url_for('history') }}" class="result-link">View all →</a>
+    </div>
+    {% if recent %}
+    <table class="history-table">
+      <thead><tr><th>Date</th><th>Title</th><th>Prediction</th><th>Confidence</th></tr></thead>
+      <tbody>
+        {% for entry in recent %}
+        <tr>
+          <td class="col-date">{{ entry.created_at.strftime('%b %d, %H:%M') }}</td>
+          <td class="col-title">{{ entry.news_title }}</td>
+          <td><span class="badge badge-{{ 'real' if entry.prediction == 'REAL' else 'fake' }}">{{ 'Real ✅' if entry.prediction == 'REAL' else 'Fake ❌' }}</span></td>
+          <td class="col-confidence">{{ '%.1f'|format(entry.confidence) }}%</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="table-empty-inline">No predictions logged yet.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.3/chart.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+  window.CHART_DATA = { real: {{ stats.real }}, fake: {{ stats.fake }} };
+</script>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

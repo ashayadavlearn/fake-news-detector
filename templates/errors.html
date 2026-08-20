@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} — Veritas{% endblock %}
+{% block content %}
+<section class="error-section">
+  <div class="error-card liquid-glass reveal">
+    <span class="error-code">{{ code }}</span>
+    <h1>{{ message }}</h1>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">Back to home</a>
+  </div>
+</section>
+{% endblock %}

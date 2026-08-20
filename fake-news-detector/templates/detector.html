@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Detector — Veritas{% endblock %}
+{% block bodyclass %}page-detector{% endblock %}
+
+{% block content %}
+<section class="detector-section">
+  <div class="section-head reveal">
+    <span class="eyebrow">The detector</span>
+    <h1>Paste it. Check it. Know it.</h1>
+    <p class="section-sub">Works on a single headline or a full article body.</p>
+  </div>
+
+  <div class="detector-layout">
+    <form class="detector-card liquid-glass" id="detectorForm" method="POST" action="{{ url_for('detector') }}" novalidate>
+      {{ form.hidden_tag() }}
+      <label for="newsText" class="field-label">News headline or article text</label>
+      {{ form.news_text(id="newsText", class="detector-textarea", placeholder="Paste a headline or the full article body here…", rows="10") }}
+      <div class="field-row">
+        <span class="char-count"><span id="charCount">0</span> characters</span>
+        {% for error in form.news_text.errors %}
+          <span class="field-error">{{ error }}</span>
+        {% endfor %}
+      </div>
+
+      <div class="detector-actions">
+        <button type="submit" class="btn btn-primary" id="detectBtn">
+          <span class="btn-label">Detect</span>
+          <span class="btn-spinner" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="btn btn-ghost" id="clearBtn">Clear</button>
+        <button type="button" class="btn btn-ghost" id="sampleBtn">Sample news</button>
+      </div>
+    </form>
+
+    <div class="result-card liquid-glass" id="resultCard" data-empty="{{ 'false' if result else 'true' }}">
+      {% if result %}
+        <div class="result-content" id="resultContent" data-visible="true">
+          <span class="result-eyebrow">Verdict</span>
+          <div class="verdict verdict-{{ 'real' if result.label == 'REAL' else 'fake' }}" id="verdictLabel">
+            {% if result.label == 'REAL' %}Real News ✅{% else %}Fake News ❌{% endif %}
+          </div>
+          <div class="confidence-block">
+            <div class="confidence-row">
+              <span>Confidence</span>
+              <span id="confidenceValue">{{ result.confidence }}%</span>
+            </div>
+            <div class="confidence-track">
+              <div class="confidence-fill confidence-{{ 'real' if result.label == 'REAL' else 'fake' }}" id="confidenceFill" style="width: {{ result.confidence }}%;"></div>
+            </div>
+          </div>
+          <p class="result-meta">Scored by <strong id="modelUsed">{{ result.model_used }}</strong> · logged as entry #<span id="entryId">{{ result.id }}</span></p>
+          <a href="{{ url_for('history') }}" class="result-link">View in history →</a>
+        </div>
+      {% else %}
+        <div class="result-empty" id="resultEmpty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 6V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V6L12 2Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 12L11 14L15.5 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <p>Your verdict will appear here.</p>
+        </div>
+        <div class="result-content" id="resultContent" data-visible="false">
+          <span class="result-eyebrow">Verdict</span>
+          <div class="verdict" id="verdictLabel"></div>
+          <div class="confidence-block">
+            <div class="confidence-row">
+              <span>Confidence</span>
+              <span id="confidenceValue">0%</span>
+            </div>
+            <div class="confidence-track">
+              <div class="confidence-fill" id="confidenceFill" style="width: 0%;"></div>
+            </div>
+          </div>
+          <p class="result-meta">Scored by <strong id="modelUsed"></strong> · logged as entry #<span id="entryId"></span></p>
+          <a href="{{ url_for('history') }}" class="result-link">View in history →</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.VERITAS_CSRF = "{{ form.csrf_token._value() }}";
+  window.SAMPLE_NEWS = {
+    real: "The finance ministry confirmed on Wednesday that the annual budget review will proceed as scheduled, according to a statement released by officials familiar with the matter. Lawmakers are expected to debate the proposal in committee next month before a full vote.",
+    fake: "SHOCKING: Insiders reveal the secret cure that doctors don't want you to know about! Share this before it gets taken down — the mainstream media refuses to report on what was leaked by an anonymous whistleblower."
+  };
+</script>
+<script src="{{ url_for('static', filename='js/detector.js') }}"></script>
+{% endblock %}
